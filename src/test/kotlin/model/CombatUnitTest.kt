@@ -2,10 +2,7 @@ package model
 
 import exception.CombatUnitMergeException
 import io.kotest.matchers.shouldBe
-import io.mockk.every
-import io.mockk.mockk
 import org.junit.jupiter.api.Test
-import testData.TestUnits
 import testData.TestUnits.fiveManUnit
 import testData.TestUnits.testMarine
 import testData.TestUnits.unitToFind

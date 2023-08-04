@@ -12,9 +12,6 @@ data class Model(
     val wounds: BigDecimal,
     val frequency: String,
 ){
-
-    fun asCombatUnit() = CombatUnit.fromModelAndWeapon(this)
-
     companion object {
         fun fromString(input:String, resourceReader: ResourceReader): Map<Model, Int> {
             val modelAndQuantityMap:MutableMap<Model, Int> = HashMap()

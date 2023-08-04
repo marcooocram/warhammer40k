@@ -37,14 +37,6 @@ object TestUnits {
         frequency = "n/a"
     )
 
-    val zeroManUnit  = CombatUnit(
-        name = "tenTEstMarines",
-        additionalName ="",
-        weapons = emptyMap(),
-        models = mapOf(testMarine to 0),
-        totalPoints = 0
-    )
-
     val oneManUnit  = CombatUnit(
         name = "tenTEstMarines",
         additionalName ="",
