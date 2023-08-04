@@ -41,7 +41,7 @@ class EagerAllResourceReader(
     private val weapons = grass<WeaponFromCSV>().harvest(weaponsCsv).map { it.toWeapon() }
 
     @OptIn(ExperimentalStdlibApi::class)
-    private val targets = grass<ModelFromCsv>().harvest(targetsCsv).map { it.toModel() }
+    private val targets = grass<ModelFromCsv>().harvest(targetsCsv).map { it.toModel(this) }
 
     @OptIn(ExperimentalStdlibApi::class)
     private val units = grass<UnitFromCsv>().harvest(unitsCsv).map { it.toCombatUnit(this) }

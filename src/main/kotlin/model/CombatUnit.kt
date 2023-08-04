@@ -5,8 +5,7 @@ import exception.CombatUnitMergeException
 
 data class  CombatUnit(
     val name: String,
-    val additionalName:String,
-    val weapons: Map<Weapon, Int>,
+    val additionalName:String?,
     val models: Map<Model, Int>,
     val totalPoints: Int,
     val hasMoved: Boolean = false,
@@ -21,10 +20,6 @@ data class  CombatUnit(
 
         val newName = "${thisNameQuantity.second + otherNameQuantity.second}*${thisNameQuantity.first}"
 
-        val newWeapons = this.weapons.toMutableMap().apply {
-            otherUnit.weapons.forEach { (k, v) -> merge(k, v) { thisVal, otherVal -> thisVal + otherVal } }
-        }
-
         val newModels = this.models.toMutableMap().apply {
             otherUnit.models.forEach { (k, v) -> merge(k, v) { thisVal, otherVal -> thisVal + otherVal } }
         }
@@ -32,10 +27,22 @@ data class  CombatUnit(
         return CombatUnit(
             name = newName,
             additionalName = this.additionalName,
-            weapons = newWeapons,
             models = newModels,
             totalPoints = this.totalPoints + otherUnit.totalPoints
         )
+    }
+
+    fun addModel(model: Model): CombatUnit  {
+        val mutableModels =  models.toMutableMap()
+        if (models.containsKey(model)){
+            val amount: Int? = models[model]
+            mutableModels.remove(model)
+            mutableModels[model] = 1 + (amount ?: 0 )
+            return this.copy(models = mutableModels)
+        } else {
+            mutableModels[model] = 1
+        }
+        return this.copy(models = mutableModels)
     }
 
     private fun splitName(name: String): Pair<String, Int> {
@@ -48,20 +55,18 @@ data class  CombatUnit(
     }
 
     companion object{
-        fun fromModelAndWeapon(model: Model? = null,  weapon: Weapon? = null) = CombatUnit(
-            name = "single ${model?.name ?: "soldier"}",
+        fun fromModel(model: Model) = CombatUnit(
+            name = "single ${model.name}",
             additionalName = "",
-            weapons = weapon?.let { mapOf(it to 1) } ?: emptyMap(),
-            models = mapOf(Pair( model ?: Model.DefaultSpaceMarine,1)),
-            totalPoints = 20
+            models = mapOf(model to 1),
+            totalPoints = 20,
         )
     }
 }
 
 data class UnitFromCsv(
     val name: String,
-    val additionalName:String,
-    val weapons: String,
+    val additionalName:String?,
     val models: String,
     val totalPoints: Int
 ) {
@@ -69,7 +74,6 @@ data class UnitFromCsv(
         return CombatUnit(
             name = this.name,
             additionalName = this.additionalName,
-            weapons = Weapon.fromString(this.weapons, resourceReader),
             models = Model.fromString(this.models, resourceReader),
             totalPoints = this.totalPoints
         )

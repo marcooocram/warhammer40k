@@ -11,6 +11,7 @@ data class Model(
     val toughness: Int,
     val wounds: BigDecimal,
     val frequency: String,
+    val weapons: Map<Weapon, Int>,
 ){
     companion object {
         fun fromString(input:String, resourceReader: ResourceReader): Map<Model, Int> {
@@ -21,16 +22,6 @@ data class Model(
             }
             return modelAndQuantityMap
         }
-
-        val DefaultSpaceMarine = Model(
-            name = "DefaultSpaceMarine",
-            savingThrow = 3,
-            inVulSavingThrow = 7,
-            feelNoPain = 7,
-            toughness = 4,
-            wounds = BigDecimal("2.00"),
-            frequency = "1.0",
-        )
     }
 }
 
@@ -42,8 +33,9 @@ data class ModelFromCsv(
     val toughness: Int,
     val wounds: Int,
     val frequency: String,
+    val weapons: String?,
 ) {
-    fun toModel(): Model {
+    fun toModel(resourceReader: ResourceReader): Model {
         return Model(
             name = this.name,
             savingThrow = this.savingThrow,
@@ -52,6 +44,7 @@ data class ModelFromCsv(
             toughness = this.toughness,
             wounds = BigDecimal(this.wounds),
             frequency = this.frequency,
+            weapons = Weapon.fromString(this.weapons, resourceReader),
         )
 
     }

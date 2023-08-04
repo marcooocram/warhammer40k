@@ -22,22 +22,22 @@ class WeaponKeywordTest {
 
         val testCases = listOf(
             row(TestUnits.oneManUnit, TestUnits.oneManUnit, DmgMod()),
-            row(TestUnits.oneManUnit, TestUnits.fiveManUnit, DmgMod()),
+            row(TestUnits.oneManUnit, TestUnits.fiveManUnit(), DmgMod()),
             row(TestUnits.oneManUnit, TestUnits.tenManUnit, DmgMod()),
             row(TestUnits.oneManUnit, TestUnits.twentyManUnit, DmgMod()),
 
-            row(TestUnits.fiveManUnit, TestUnits.oneManUnit, DmgMod(plusShots = 1)),
-            row(TestUnits.fiveManUnit, TestUnits.fiveManUnit, DmgMod(plusShots = 1)),
-            row(TestUnits.fiveManUnit, TestUnits.tenManUnit, DmgMod(plusShots = 1)),
-            row(TestUnits.fiveManUnit, TestUnits.twentyManUnit, DmgMod(plusShots = 1)),
+            row(TestUnits.fiveManUnit(), TestUnits.oneManUnit, DmgMod(plusShots = 1)),
+            row(TestUnits.fiveManUnit(), TestUnits.fiveManUnit(), DmgMod(plusShots = 1)),
+            row(TestUnits.fiveManUnit(), TestUnits.tenManUnit, DmgMod(plusShots = 1)),
+            row(TestUnits.fiveManUnit(), TestUnits.twentyManUnit, DmgMod(plusShots = 1)),
 
             row(TestUnits.tenManUnit, TestUnits.oneManUnit, DmgMod(plusShots = 2)),
-            row(TestUnits.tenManUnit, TestUnits.fiveManUnit, DmgMod(plusShots = 2)),
+            row(TestUnits.tenManUnit, TestUnits.fiveManUnit(), DmgMod(plusShots = 2)),
             row(TestUnits.tenManUnit, TestUnits.tenManUnit, DmgMod(plusShots = 2)),
             row(TestUnits.tenManUnit, TestUnits.twentyManUnit, DmgMod(plusShots = 2)),
 
             row(TestUnits.twentyManUnit, TestUnits.oneManUnit, DmgMod(plusShots = 4)),
-            row(TestUnits.twentyManUnit, TestUnits.fiveManUnit, DmgMod(plusShots = 4)),
+            row(TestUnits.twentyManUnit, TestUnits.fiveManUnit(), DmgMod(plusShots = 4)),
             row(TestUnits.twentyManUnit, TestUnits.tenManUnit, DmgMod(plusShots = 4)),
             row(TestUnits.twentyManUnit, TestUnits.twentyManUnit, DmgMod(plusShots = 4))
         )

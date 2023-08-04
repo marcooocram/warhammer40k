@@ -7,6 +7,7 @@ import io.kotest.matchers.comparables.shouldBeEqualComparingTo
 import io.kotest.matchers.shouldBe
 import model.*
 import org.junit.jupiter.api.Test
+import testData.ComparisonFunctions.compareUnitsIgnoreWeapons
 import testData.TestUnits.fiveManUnit
 import testData.TestUnits.simpleSoldier
 import testData.TestUnits.testMarine
@@ -94,35 +95,36 @@ class SimpleShootingCalculatorTest {
 
     @Test
     fun estimateLosses() = runBlocking {
-        val fiveManUnitWithGuns = fiveManUnit.copy(weapons = mapOf(weaponWithKeyWord to 5))
-        val fiveManUnitWithGuns2 = fiveManUnit.copy(weapons = mapOf(simpleWeapon to 25))
-        val fiveManUnitWithHeavyGun = fiveManUnit.copy(weapons = mapOf(heavyWeapon to 1))
-        val fiveManUnitWithSuperHeavyGun = fiveManUnit.copy(weapons = mapOf(superHeavyWeapon to 1))
-        val fiveManUnitWithHeavyGuns = fiveManUnit.copy(weapons = mapOf(heavyWeapon to 5))
-        val oneManUnit = fiveManUnit.copy(models = mapOf(testMarine to 1))
+        val fiveManUnitWithGuns = fiveManUnit(weaponWithKeyWord)
+        val fiveManUnitWithGuns2 = fiveManUnit(simpleWeapon, 5)
+        val unitWithHevyGun = CombatUnit.fromModel(testMarine(heavyWeapon))
+        val unitWithSuperHeavyGun = CombatUnit.fromModel(testMarine(superHeavyWeapon))
+        val fiveManUnitWithHeavyGuns = fiveManUnit(heavyWeapon)
+        val oneManUnit = CombatUnit.fromModel(testMarine(simpleWeapon))
 
         val testCases = listOf(
-            row(fiveManUnitWithGuns, fiveManUnit, BigDecimal("0.40")),
-            row(fiveManUnitWithGuns2, fiveManUnit, BigDecimal("2.00")),
-            row(fiveManUnitWithHeavyGun, fiveManUnit, BigDecimal("0.83")),
-            row(fiveManUnitWithHeavyGuns, fiveManUnit, BigDecimal("4.15")),
-            row(fiveManUnitWithHeavyGun, oneManUnit, BigDecimal("8.83")),
-            row(fiveManUnitWithSuperHeavyGun, fiveManUnit, BigDecimal("8.30")),
+            row(fiveManUnitWithGuns, fiveManUnit(), BigDecimal("0.40")),
+            row(fiveManUnitWithGuns2, fiveManUnit(), BigDecimal("2.00")),
+            row(unitWithHevyGun, fiveManUnit(), BigDecimal("0.83")),
+            row(fiveManUnitWithHeavyGuns, fiveManUnit(), BigDecimal("4.15")),
+            row(unitWithHevyGun, oneManUnit, BigDecimal("8.83")),
+            row(unitWithSuperHeavyGun, fiveManUnit(), BigDecimal("8.30")),
         )
         forAll(*testCases.toTypedArray()){shootingUnit: CombatUnit, targetUnit: CombatUnit, expectedDamage: BigDecimal ->
             val fallen  = expectedDamage.toInt() / 2
-            val fourManUnit: CombatUnit? = if (fallen >= 4) { null } else fiveManUnit.copy(models = mapOf(testMarine to 4 - fallen))
-            val injuredSoldier = fiveManUnit.copy(models = mapOf(testMarine.copy(wounds = testMarine.wounds - (expectedDamage - BigDecimal(fallen).multiply(BigDecimal("2.00")))) to 1))
-            sut.estimateLosses(shootingUnit, targetUnit).models shouldBe injuredSoldier.merge(fourManUnit).models
+            val fourManUnit: CombatUnit? = if (fallen >= 4) { null } else fiveManUnit().copy(models = mapOf(testMarine() to 4 - fallen))
+            val injuredSoldier = fiveManUnit().copy(models = mapOf(testMarine().copy(wounds = testMarine().wounds - (expectedDamage - BigDecimal(fallen).multiply(BigDecimal("2.00")))) to 1))
+
+            sut.estimateLosses(shootingUnit, targetUnit).models.compareUnitsIgnoreWeapons(injuredSoldier.merge(fourManUnit).models)
         }
     }
 
     @Test
     fun estimateLossesForWipe() = runBlocking {
-        val fiveManUnitWithHeavyGuns = fiveManUnit.copy(weapons = mapOf(heavyWeapon to 50))
-        val fiveManUnitWithGuns2 = fiveManUnit.copy(weapons = mapOf(simpleWeapon to 25))
-        val oneManUnit = fiveManUnit.copy(models = mapOf(testMarine to 1))
-        val diverseUnit = fiveManUnit.copy(models = mapOf(testMarineWithDifferentName to 1  , testMarine to 1))
+        val fiveManUnitWithHeavyGuns = fiveManUnit(heavyWeapon, 10)
+        val fiveManUnitWithGuns2 = fiveManUnit(simpleWeapon, 5)
+        val oneManUnit = CombatUnit.fromModel(testMarine())
+        val diverseUnit = CombatUnit.fromModel(testMarineWithDifferentName).addModel(testMarine())
 
         val testCases = listOf(
             row(fiveManUnitWithHeavyGuns, oneManUnit),
@@ -133,5 +135,4 @@ class SimpleShootingCalculatorTest {
             sut.estimateLosses(shootingUnit, targetUnit).models.size shouldBe 0
         }
     }
-
 }
