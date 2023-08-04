@@ -34,14 +34,14 @@ data class  CombatUnit(
 
     fun addModel(model: Model): CombatUnit  {
         val mutableModels =  models.toMutableMap()
-        if (models.containsKey(model)){
-            val amount: Int? = models[model]
+
+        models[model]?.let { amount ->
             mutableModels.remove(model)
-            mutableModels[model] = 1 + (amount ?: 0 )
-            return this.copy(models = mutableModels)
-        } else {
+            mutableModels[model] = 1 + amount
+        } ?: run {
             mutableModels[model] = 1
         }
+
         return this.copy(models = mutableModels)
     }
 

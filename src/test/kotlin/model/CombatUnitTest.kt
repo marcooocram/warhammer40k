@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import testData.ComparisonFunctions.compareUnitsIgnoreWeapons
 import testData.TestUnits.fiveManUnit
+import testData.TestUnits.simpleSoldier
 import testData.TestUnits.testMarine
 import testData.TestUnits.unitToFind
 import testData.TestUnits.unitWithAsteriskInName
@@ -50,4 +51,22 @@ class CombatUnitTest {
         )
 
     }
+
+    @Test
+    fun addModel(){
+        fiveManUnit(simpleWeapon).addModel(testMarine(simpleWeapon)) shouldBe CombatUnit(
+            name = "testMarines",
+            additionalName = "",
+            models = mapOf(Pair(testMarine(simpleWeapon),6)),
+            totalPoints = 0
+        )
+
+        fiveManUnit(simpleWeapon).addModel(simpleSoldier) shouldBe CombatUnit(
+            name = "testMarines",
+            additionalName = "",
+            models = mapOf(testMarine(simpleWeapon) to 5, simpleSoldier to 1),
+            totalPoints = 0
+        )
+    }
+
 }
