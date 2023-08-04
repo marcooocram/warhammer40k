@@ -23,6 +23,7 @@ dependencies {
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.15.2")
     implementation("io.github.blackmo18:kotlin-grass-core-jvm:1.0.0")
     implementation("io.github.blackmo18:kotlin-grass-parser-jvm:0.8.0")
+    testImplementation(kotlin("reflect"))
 }
 
 tasks.test {

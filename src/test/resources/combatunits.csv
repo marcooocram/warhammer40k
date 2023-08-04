@@ -1,4 +1,3 @@
-name, additionalName, weapons, models, totalPoints
-Intercessor Squad, GrenadeLauncher_Five_Frag, 1*Grenade Launcher - Frag + 4*Bolt Rifle, 5*Space Marine, 95
-Intercessor Squad, GrenadeLauncher_Five_Krak, 1*Grenade Launcher - Krak + 4*Bolt Rifle, 5*Space Marine, 95
-Desolation Squad, Five_Krak, 1*Vengor Launcher + 5*Castellan Launcher + 4*Superkrak Rocket Launcher ,5*Space Marine, 170
+name, additionalName, models, totalPoints
+Intercessor Squad,, 5*Space Marine with Bolt Rifle, 95
+Desolation Squad,, 5*Space Marine with RocketLauncher, 170

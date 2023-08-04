@@ -1,3 +1,6 @@
-name, savingThrow, inVulSavingThrow, feelNoPain, toughness, wounds, frequency
-Space Marine, 3, 7, 7, 4, 2, 0.8
-Primaris Captain, 3, 4, 7, 4, 5, 0.1
+name, savingThrow, inVulSavingThrow, feelNoPain, toughness, wounds, frequency, weapons
+Space Marine, 3, 7, 7, 4, 2, 0.8,
+Space Marine with Bolt Rifle, 3, 7, 7, 4, 2, 0.8, Bolt Rifle
+Space Marine with RocketLauncher, 3, 7, 7, 4, 2, 0.8, Castellan Launcher + Superkrak Rocket Launcher
+Primaris Captain, 3, 4, 7, 4, 5, 0.1, Bolt Pistol 2+
+WAR DOG EXECUTIONER, 3, 5, 7, 10, 12, 0.0,

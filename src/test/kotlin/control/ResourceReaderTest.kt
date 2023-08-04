@@ -1,7 +1,6 @@
 package control
 
 import exception.ItemNotFoundException
-import exception.ResourceException
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import model.CombatUnit
@@ -87,8 +86,8 @@ class ResourceReaderTest {
 
 private class TestableResourceReader: ResourceReader {
     val weapons = mutableListOf(simpleWeapon)
-    val targets = mutableListOf(simpleSoldier, testMarine)
-    val units = mutableListOf(unitToFind, twentyManUnit, fiveManUnit, oneManUnit)
+    val targets = mutableListOf(simpleSoldier, testMarine(simpleWeapon))
+    val units = mutableListOf(unitToFind, twentyManUnit, fiveManUnit(), oneManUnit)
 
     override fun weapons(): List<Weapon> {
         return weapons

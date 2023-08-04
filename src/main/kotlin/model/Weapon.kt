@@ -35,11 +35,14 @@ data class Weapon(
     val toHit: Int,
 ) {
     companion object{
-        fun fromString(input:String, resourceReader: ResourceReader): Map<Weapon, Int> {
+        fun fromString(input:String?, resourceReader: ResourceReader): Map<Weapon, Int> {
+            if (input == null) return emptyMap()
             val weaponAndQuantityMap:MutableMap<Weapon, Int> = HashMap()
             input.split("+", ignoreCase = true).filter { it.isNotEmpty() }.map { quantityAndName ->
-                val qan = quantityAndName.trim().split("*")
-                weaponAndQuantityMap.put(resourceReader.weapons().find { it.name.contains(qan[1].trim()) }!!, Integer.parseInt(qan[0]))
+                val split = quantityAndName.trim().split("*")
+                val quantity = if (split.size > 1) Integer.parseInt(split[0]) else 1
+                val name = if (split.size > 1) split[1].trim() else quantityAndName.trim()
+                weaponAndQuantityMap.put(resourceReader.weapons().find { it.name.contains(name) }!!, quantity)
             }
             return weaponAndQuantityMap
         }

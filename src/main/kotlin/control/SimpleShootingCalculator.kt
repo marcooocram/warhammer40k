@@ -17,10 +17,16 @@ class SimpleShootingCalculator :ShootinCalculator {
     }
 
     override fun estimateLosses(shootingCombatUnit: CombatUnit, targetCombatUnit: CombatUnit): CombatUnit {
-        if (shootingCombatUnit.weapons.isEmpty()) return targetCombatUnit
-        val weapons: MutableMap<Weapon, Int> = shootingCombatUnit.weapons.toMutableMap()
-        val weaponEntry = weapons.entries.first()
+        val weapons: MutableMap<Weapon, Int> = shootingCombatUnit.models.flatMap { (model, amountModel) ->
+            model.weapons.map { (weapon, amountWeapon) -> weapon to amountModel * amountWeapon }
+        }.groupBy({ it.first }, { it.second }).mapValues { (_, values) -> values.sum() }.toMutableMap()
 
+        return fireWeapons(weapons, targetCombatUnit, shootingCombatUnit)
+    }
+
+    private fun fireWeapons(weapons: MutableMap<Weapon, Int>, targetCombatUnit: CombatUnit, shootingCombatUnit: CombatUnit): CombatUnit {
+        if (weapons.isEmpty()) return targetCombatUnit
+        val weaponEntry = weapons.entries.first()
         val targets: MutableMap<Model, Int> = targetCombatUnit.models.toMutableMap()
         val targetEntry = targets.entries.first()
 
@@ -30,14 +36,11 @@ class SimpleShootingCalculator :ShootinCalculator {
                 .map { it.dmgMod(targetCombatUnit, shootingCombatUnit) }
 
         val inflictedDamage = BigDecimal(weaponEntry.value).multiply(estimatedDamage(weaponEntry.key, targetEntry.key, appliedRules))
-
         weapons.remove(weaponEntry.key)
         targets.remove(targetEntry.key)
 
         targets.putAll(getNewTargetMap(mutableMapOf(), inflictedDamage, targetEntry.key, targetEntry.value, targets))
-
-        //TODO also remove weapons if damaged
-        return estimateLosses(shootingCombatUnit.copy(weapons = weapons ), targetCombatUnit.copy(models = targets))
+        return fireWeapons(weapons, targetCombatUnit.copy(models = targets), shootingCombatUnit)
     }
 
     private fun getNewTargetMap(acc:MutableMap<Model, Int>, inflictedDamage: BigDecimal, target: Model, amountTargets: Int, targets: MutableMap<Model, Int>): Map<Model, Int> {
