@@ -65,8 +65,8 @@ enum class Roll(val min: Int, val dice: Dice = Dice.D6) {
 object Value {
     fun averageFromString(input:String): BigDecimal {
         return input.split("+", ignoreCase = true)
-            .filter { it.isNotEmpty() }
             .map { it.trim() }
+            .filter { it.isNotEmpty() }
             .map { value ->
                 if (value.isNumeric()) BigDecimal(value)
                 else Dice.valueOf(value).average
@@ -78,8 +78,8 @@ object Value {
         val numerics = mutableListOf(0)
         val dice = mutableListOf<Dice>()
         damageString.split("+", ignoreCase = true)
-            .filter { it.isNotEmpty() }
             .map { it.trim() }
+            .filter { it.isNotEmpty() }
             .forEach {
                 if (it.isNumeric()) numerics.add(Integer.parseInt(it))
                 else dice.add(Dice.valueOf(it))

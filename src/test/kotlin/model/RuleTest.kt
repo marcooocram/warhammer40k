@@ -1,10 +1,7 @@
 package model
 
-import io.kotest.matchers.equality.shouldBeEqualToComparingFields
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 
 class RuleTest {
 
@@ -17,6 +14,9 @@ class RuleTest {
         )
 
         rule.remove() shouldBe rule
-       // rule.remove() shouldBeEqualToComparingFields rule
+        rule.remove().dmgMod shouldBe rule.dmgMod
+        rule.remove().condition shouldBe rule.condition
+        rule.removed shouldBe false
+        rule.remove().removed shouldBe true
     }
 }

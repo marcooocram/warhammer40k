@@ -1,5 +1,6 @@
 package model
 
+import GeneratedCode
 import java.math.BigDecimal
 
 data class Rule(
@@ -9,6 +10,7 @@ data class Rule(
 ){
     fun remove(): Rule = this.copy(removed = true)
 
+    @GeneratedCode
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -19,6 +21,7 @@ data class Rule(
         return condition == other.condition
     }
 
+    @GeneratedCode
     override fun hashCode(): Int {
         var result = dmgMod.hashCode()
         result = 31 * result + condition.hashCode()
