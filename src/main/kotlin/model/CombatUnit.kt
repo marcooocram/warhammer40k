@@ -12,7 +12,8 @@ data class  CombatUnit(
     val hasMoved: Boolean = false,
     val hasAdvanced:Boolean = false,
 ) {
-    fun merge(otherUnit: CombatUnit): CombatUnit {
+    fun merge(otherUnit: CombatUnit?): CombatUnit {
+        if (otherUnit == null) return this
         val thisNameQuantity = splitName(this.name)
         val otherNameQuantity = splitName(otherUnit.name)
 
@@ -20,7 +21,7 @@ data class  CombatUnit(
 
         val newName = "${thisNameQuantity.second + otherNameQuantity.second}*${thisNameQuantity.first}"
 
-        val neWeapons = this.weapons.toMutableMap().apply {
+        val newWeapons = this.weapons.toMutableMap().apply {
             otherUnit.weapons.forEach { (k, v) -> merge(k, v) { thisVal, otherVal -> thisVal + otherVal } }
         }
 
@@ -31,7 +32,7 @@ data class  CombatUnit(
         return CombatUnit(
             name = newName,
             additionalName = this.additionalName,
-            weapons = neWeapons,
+            weapons = newWeapons,
             models = newModels,
             totalPoints = this.totalPoints + otherUnit.totalPoints
         )

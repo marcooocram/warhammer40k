@@ -18,16 +18,20 @@ class CombatUnitTest {
     @Test
     fun merge() {
         val mergeResult = fiveManUnit.merge(fiveManUnit)
-        mergeResult.models shouldBe mapOf(TestUnits.testMarine to 10)
+        mergeResult.models shouldBe mapOf(testMarine to 10)
         mergeResult.name shouldBe "2*${fiveManUnit.name}"
 
         val tripleMerge = mergeResult.merge(fiveManUnit)
-        tripleMerge.models shouldBe mapOf(TestUnits.testMarine to 15)
+        tripleMerge.models shouldBe mapOf(testMarine to 15)
         tripleMerge.name shouldBe "3*${fiveManUnit.name}"
 
         val mergedMergeResult = mergeResult.merge(mergeResult)
-        mergedMergeResult.models shouldBe mapOf(TestUnits.testMarine to 20)
+        mergedMergeResult.models shouldBe mapOf(testMarine to 20)
         mergedMergeResult.name shouldBe "4*${fiveManUnit.name}"
+
+        val nullmergeResult = fiveManUnit.merge(null)
+        nullmergeResult.models shouldBe mapOf(testMarine to 5)
+        nullmergeResult.name shouldBe fiveManUnit.name
 
         assertFailsWith<CombatUnitMergeException>(
             block = { fiveManUnit.merge(unitToFind) }

@@ -31,7 +31,7 @@ data class Model(
             inVulSavingThrow = 7,
             feelNoPain = 7,
             toughness = 4,
-            wounds = BigDecimal(2),
+            wounds = BigDecimal("2.00"),
             frequency = "1.0",
         )
     }

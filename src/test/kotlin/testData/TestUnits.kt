@@ -12,9 +12,10 @@ object TestUnits {
         inVulSavingThrow = 7,
         feelNoPain = 7,
         toughness = 4,
-        wounds = BigDecimal("1"),
+        wounds = BigDecimal("1.00"),
         frequency = "n/a",
     )
+
 
     val testMarine = Model(
         name =  "testMarine",
@@ -22,7 +23,17 @@ object TestUnits {
         inVulSavingThrow = 7,
         feelNoPain = 7,
         toughness = 4,
-        wounds = BigDecimal("2"),
+        wounds = BigDecimal("2.00"),
+        frequency = "n/a"
+    )
+
+    val testMarineWithDifferentName = Model(
+        name =  "testMarineWithDifferentName",
+        savingThrow = 3,
+        inVulSavingThrow = 7,
+        feelNoPain = 7,
+        toughness = 4,
+        wounds = BigDecimal("2.00"),
         frequency = "n/a"
     )
 

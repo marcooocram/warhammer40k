@@ -43,15 +43,15 @@ class SimpleShootingCalculator :ShootinCalculator {
     private fun getNewTargetMap(acc:MutableMap<Model, Int>, inflictedDamage: BigDecimal, target: Model, amountTargets: Int, targets: MutableMap<Model, Int>): Map<Model, Int> {
         when {
             inflictedDamage < target.wounds -> {
-                acc.put(target.copy(wounds = target.wounds - inflictedDamage), 1)
-                if (amountTargets > 1) acc.put(target, amountTargets - 1)
+                acc[target.copy(wounds = target.wounds - inflictedDamage)] = 1
+                if (amountTargets > 1) acc[target] = amountTargets - 1
                 return acc
             }
-            inflictedDamage == target.wounds -> {
-                if (amountTargets > 1) acc.put(target, amountTargets - 1)
+            inflictedDamage - target.wounds == BigDecimal("0.00") -> {
+                if (amountTargets > 1) acc[target] = amountTargets - 1
                 return acc
             }
-            inflictedDamage > target.wounds -> {
+            else -> {
                 if (amountTargets > 1) getNewTargetMap(acc,inflictedDamage - target.wounds, target, amountTargets - 1, targets)
                 else if (targets.isNotEmpty()) {
                     val targetEntry = targets.entries.first()

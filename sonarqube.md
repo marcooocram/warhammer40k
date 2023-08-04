@@ -13,7 +13,6 @@ for test coverage sonarqube relies on Jacoco the report can be found at:
 and is triggered via gradle task:
 Gradle -> Tasks -> verification -> jacocoTestReport
 
-
 ### issues
  null safe operators like this "single ${model?.name ?: "soldier"}"
  cause coverage issue related to redundant nullchecks by the compiler, see https://youtrack.jetbrains.com/issue/KT-52472
