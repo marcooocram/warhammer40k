@@ -7,7 +7,10 @@ import io.kotest.matchers.comparables.shouldBeEqualComparingTo
 import io.kotest.matchers.shouldBe
 import model.*
 import org.junit.jupiter.api.Test
+import testData.TestUnits.fiveManUnit
 import testData.TestUnits.simpleSoldier
+import testData.TestUnits.testMarine
+import testData.TestWeapons.heavyWeapon
 import testData.TestWeapons.simpleWeapon
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -87,6 +90,34 @@ class SimpleShootingCalculatorTest {
     }
 
     @Test
-    fun estimateLosses() {
+    fun estimateLosses() = runBlocking {
+        val fiveManUnitWithGuns = fiveManUnit.copy(weapons = mapOf(simpleWeapon to 5))
+        val fiveManUnitWithHeavyGun = fiveManUnit.copy(weapons = mapOf(heavyWeapon to 1))
+        val fiveManUnitWithHeavyGuns = fiveManUnit.copy(weapons = mapOf(heavyWeapon to 5))
+
+        val testCases = listOf(
+            row(fiveManUnitWithGuns, fiveManUnit, BigDecimal("0.40")),
+            row(fiveManUnitWithHeavyGun, fiveManUnit, BigDecimal("0.83")),
+            row(fiveManUnitWithHeavyGuns, fiveManUnit, BigDecimal("4.15")),
+        )
+        forAll(*testCases.toTypedArray()){shootingUnit: CombatUnit, targetUnit: CombatUnit, expectedDamage: BigDecimal ->
+            val fallen  = expectedDamage.toInt() / 2
+            val fourManUnit = fiveManUnit.copy(models = mapOf(testMarine to 4 - fallen))
+            val injuredSoldier = fiveManUnit.copy(models = mapOf(testMarine.copy(wounds = testMarine.wounds - (expectedDamage - BigDecimal(fallen).multiply(BigDecimal("2.00")))) to 1))
+            sut.estimateLosses(shootingUnit, targetUnit).models shouldBe fourManUnit.merge(injuredSoldier).models
+        }
     }
+
+    @Test
+    fun estimateLossesForWipe() = runBlocking {
+        val fiveManUnitWithHeavyGuns = fiveManUnit.copy(weapons = mapOf(heavyWeapon to 50))
+
+        val testCases = listOf(
+            row(fiveManUnitWithHeavyGuns, fiveManUnit.copy(models = mapOf(testMarine to 1)))
+        )
+        forAll(*testCases.toTypedArray()){shootingUnit: CombatUnit, targetUnit: CombatUnit ->
+            sut.estimateLosses(shootingUnit, targetUnit).models.size shouldBe 0
+        }
+    }
+
 }

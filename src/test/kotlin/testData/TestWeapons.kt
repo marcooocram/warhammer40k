@@ -14,6 +14,16 @@ object TestWeapons {
         toHit = 4,
     )
 
+    val heavyWeapon = Weapon(
+        name = " s8 BS 4 dmg6",
+        keywords = listOf(),
+        damage = "6",
+        shots = BigDecimal("1"),
+        strength = 8,
+        armourPiercing = 6,
+        toHit = 4,
+    )
+
     val searchDecoy = Weapon(
         name = "needle",
         keywords = listOf(),
