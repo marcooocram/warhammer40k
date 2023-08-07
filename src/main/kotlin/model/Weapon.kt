@@ -1,6 +1,7 @@
 package model
 
 import control.ResourceReader
+import exception.ItemNotFoundException
 import java.math.BigDecimal
 
 data class WeaponFromCSV(
@@ -15,7 +16,7 @@ data class WeaponFromCSV(
     fun toWeapon(): Weapon {
         return Weapon(
             name = this.name,
-            keywords = this.keywords?.let { WeaponKeyword.fromMultiString(it) } ?: emptyList(),
+            keywords = WeaponKeyword.fromMultiString(this.keywords),
             strength = this.strength,
             armourPiercing = this.armourPiercing,
             damage = this.damage,
@@ -42,7 +43,7 @@ data class Weapon(
                 val split = quantityAndName.trim().split("*")
                 val quantity = if (split.size > 1) Integer.parseInt(split[0]) else 1
                 val name = if (split.size > 1) split[1].trim() else quantityAndName.trim()
-                weaponAndQuantityMap.put(resourceReader.weapons().find { it.name.contains(name) }!!, quantity)
+                weaponAndQuantityMap.put(resourceReader.weapons().find { it.name.contains(name) } ?: throw ItemNotFoundException("Could not find weapon with name: $name"), quantity)
             }
             return weaponAndQuantityMap
         }

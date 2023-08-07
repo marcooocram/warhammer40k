@@ -3,7 +3,10 @@ package exception
 import ExcludeFromJacocoGeneratedReport
 
 @ExcludeFromJacocoGeneratedReport
-class ItemNotFoundException(message: String, cause: Throwable): Exception(message, cause)
+class ItemNotFoundException : Exception {
+    constructor(message: String, cause: Throwable) : super(message, cause)
+    constructor(message: String) : super(message)
+}
 
 @ExcludeFromJacocoGeneratedReport
 class ResourceException(message: String): Exception(message)

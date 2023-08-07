@@ -20,6 +20,18 @@ object TestUnits {
     )
 
 
+    val woundedTestMarine = Model(
+        name =  "testMarine",
+        savingThrow = 3,
+        inVulSavingThrow = 7,
+        feelNoPain = 7,
+        toughness = 4,
+        wounds = BigDecimal("2.00"),
+        frequency = "n/a",
+        weapons = mapOf(simpleWeapon to 1),
+        wounded = true
+    )
+
     fun testMarine(weapons: List<Weapon> = emptyList()) = Model(
         name =  "testMarine",
         savingThrow = 3,

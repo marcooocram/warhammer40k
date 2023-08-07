@@ -6,7 +6,7 @@ fun main() {
 
     val resourceReader: ResourceReader = EagerAllResourceReader()
 
-    val shootingclaculator: ShootinCalculator = SimpleShootingCalculator()
+    val shootingclaculator: ShootinCalculator = SimpleShootingCalculator(DamageDrivenDeathOrderCalculator())
     val weapon = resourceReader.weapons()[0]
     val target = resourceReader.targets()[0]
     val damage = shootingclaculator.estimatedDamage(weapon, target)

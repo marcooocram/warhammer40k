@@ -5,7 +5,10 @@ import io.kotest.data.forAll
 import io.kotest.data.row
 import io.kotest.matchers.comparables.shouldBeEqualComparingTo
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import model.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import testData.ComparisonFunctions.compareUnitsIgnoreWeapons
 import testData.TestUnits.fiveManUnit
@@ -21,7 +24,36 @@ import java.math.RoundingMode
 
 class SimpleShootingCalculatorTest {
 
-    private val sut: ShootinCalculator = SimpleShootingCalculator()
+    private val deathOrdrerCalculatorMock = mockk<DeathOrderCalculator>()
+    private val sut = SimpleShootingCalculator(deathOrdrerCalculatorMock)
+
+
+
+
+
+    @BeforeEach
+    fun init(){
+        with(deathOrdrerCalculatorMock) {
+            every {
+                fiveManUnit().orderModels(sut)
+            } returns fiveManUnit()
+
+            val oneManUnit = CombatUnit.fromModel(testMarine(simpleWeapon))
+            every {
+                oneManUnit.orderModels(sut)
+            } returns oneManUnit
+
+            val diverseUnit = CombatUnit.fromModel(testMarineWithDifferentName).addModel(testMarine())
+            every {
+                diverseUnit.orderModels(sut)
+            } returns diverseUnit
+
+            val diverseUnit2 = CombatUnit.fromModel(testMarine()).addModel(testMarineWithDifferentName)
+            every {
+                diverseUnit2.orderModels(sut)
+            } returns diverseUnit
+        }
+    }
 
     @Test
     fun estimatedDamage() = runBlocking{
@@ -113,9 +145,10 @@ class SimpleShootingCalculatorTest {
         forAll(*testCases.toTypedArray()){shootingUnit: CombatUnit, targetUnit: CombatUnit, expectedDamage: BigDecimal ->
             val fallen  = expectedDamage.toInt() / 2
             val fourManUnit: CombatUnit? = if (fallen >= 4) { null } else fiveManUnit().copy(models = mapOf(testMarine() to 4 - fallen))
-            val injuredSoldier = fiveManUnit().copy(models = mapOf(testMarine().copy(wounds = testMarine().wounds - (expectedDamage - BigDecimal(fallen).multiply(BigDecimal("2.00")))) to 1))
-
-            sut.estimateLosses(shootingUnit, targetUnit).models.compareUnitsIgnoreWeapons(injuredSoldier.merge(fourManUnit).models)
+            val leftOverDamage = expectedDamage - BigDecimal(fallen).multiply(BigDecimal("2.00"))
+            val injuredSoldier = testMarine().copy(wounds = testMarine().wounds - leftOverDamage, wounded = leftOverDamage > BigDecimal("0"))
+            val injuredSoldiers = fiveManUnit().copy(models = mapOf(injuredSoldier to 1))
+            sut.estimateLosses(shootingUnit, targetUnit).models.compareUnitsIgnoreWeapons(injuredSoldiers.merge(fourManUnit).models)
         }
     }
 
@@ -123,7 +156,7 @@ class SimpleShootingCalculatorTest {
     fun estimateLossesForWipe() = runBlocking {
         val fiveManUnitWithHeavyGuns = fiveManUnit(heavyWeapon, 10)
         val fiveManUnitWithGuns2 = fiveManUnit(simpleWeapon, 5)
-        val oneManUnit = CombatUnit.fromModel(testMarine())
+        val oneManUnit = CombatUnit.fromModel(testMarine(simpleWeapon))
         val diverseUnit = CombatUnit.fromModel(testMarineWithDifferentName).addModel(testMarine())
 
         val testCases = listOf(
@@ -135,4 +168,19 @@ class SimpleShootingCalculatorTest {
             sut.estimateLosses(shootingUnit, targetUnit).models.size shouldBe 0
         }
     }
+
+
+    @Test
+    fun orderOfDeathShouldBeKept() = runBlocking {
+        val diverseUnit = CombatUnit.fromModel(testMarine()).addModel(testMarineWithDifferentName)
+        val fiveManUnitWithGuns = fiveManUnit(weaponWithKeyWord)
+
+        sut.estimateLosses(fiveManUnitWithGuns, diverseUnit) shouldBe CombatUnit(
+            name="single testMarine",
+            additionalName = "",
+            models = mapOf(testMarine() to 1, testMarineWithDifferentName.copy(wounded = true, wounds = BigDecimal("1.60")) to 1),
+            totalPoints = 20
+        )
+    }
+
 }
