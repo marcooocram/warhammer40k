@@ -6,7 +6,8 @@ import java.math.RoundingMode
 import kotlin.math.max
 import kotlin.math.min
 
-class SimpleShootingCalculator :ShootinCalculator {
+class SimpleShootingCalculator(private val deathOrderCalculator: DeathOrderCalculator) :ShootinCalculator {
+
     override fun estimatedDamage(weapon: Weapon, target: Model, appliedRules: List<DmgMod>): BigDecimal {
         return getHits(weapon, appliedRules)
             .multiply(getWoundsPerHit(weapon, target, appliedRules))
@@ -27,26 +28,29 @@ class SimpleShootingCalculator :ShootinCalculator {
     private fun fireWeapons(weapons: MutableMap<Weapon, Int>, targetCombatUnit: CombatUnit, shootingCombatUnit: CombatUnit): CombatUnit {
         if (weapons.isEmpty()) return targetCombatUnit
         val weaponEntry = weapons.entries.first()
-        val targets: MutableMap<Model, Int> = targetCombatUnit.models.toMutableMap()
-        val targetEntry = targets.entries.first()
+        with(deathOrderCalculator) {
+            val targets: MutableMap<Model, Int> = targetCombatUnit.orderModels(this@SimpleShootingCalculator).models.toMutableMap()
 
-        val appliedRules =
-            Rule.mergeWithBasic(weaponEntry.key.keywords.flatMap { it.rules })
-                .filter { it.condition(targetCombatUnit, shootingCombatUnit) }
-                .map { it.dmgMod(targetCombatUnit, shootingCombatUnit) }
+            val targetEntry = targets.entries.first()
 
-        val inflictedDamage = BigDecimal(weaponEntry.value).multiply(estimatedDamage(weaponEntry.key, targetEntry.key, appliedRules))
-        weapons.remove(weaponEntry.key)
-        targets.remove(targetEntry.key)
+            val appliedRules =
+                Rule.mergeWithBasic(weaponEntry.key.keywords.flatMap { it.rules })
+                    .filter { it.condition(targetCombatUnit, shootingCombatUnit) }
+                    .map { it.dmgMod(targetCombatUnit, shootingCombatUnit) }
 
-        targets.putAll(getNewTargetMap(mutableMapOf(), inflictedDamage, targetEntry.key, targetEntry.value, targets))
-        return fireWeapons(weapons, targetCombatUnit.copy(models = targets), shootingCombatUnit)
+            val inflictedDamage = BigDecimal(weaponEntry.value).multiply(estimatedDamage(weaponEntry.key, targetEntry.key, appliedRules))
+            weapons.remove(weaponEntry.key)
+            targets.remove(targetEntry.key)
+
+            targets.putAll(getNewTargetMap(mutableMapOf(), inflictedDamage, targetEntry.key, targetEntry.value, targets))
+            return fireWeapons(weapons, targetCombatUnit.copy(models = targets), shootingCombatUnit)
+        }
     }
 
     private fun getNewTargetMap(acc:MutableMap<Model, Int>, inflictedDamage: BigDecimal, target: Model, amountTargets: Int, targets: MutableMap<Model, Int>): Map<Model, Int> {
         when {
             inflictedDamage < target.wounds -> {
-                acc[target.copy(wounds = target.wounds - inflictedDamage)] = 1
+                acc[target.copy(wounds = target.wounds - inflictedDamage, wounded = true)] = 1
                 if (amountTargets > 1) acc[target] = amountTargets - 1
                 return acc
             }

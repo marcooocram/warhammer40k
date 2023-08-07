@@ -12,6 +12,7 @@ data class Model(
     val wounds: BigDecimal,
     val frequency: String,
     val weapons: Map<Weapon, Int>,
+    val wounded: Boolean = false
 ){
     companion object {
         fun fromString(input:String, resourceReader: ResourceReader): Map<Model, Int> {

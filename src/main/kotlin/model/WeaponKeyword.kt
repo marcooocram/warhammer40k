@@ -24,7 +24,8 @@ enum class WeaponKeyword(val rules:List<Rule> = emptyList()) {
     SUSTAINEDHITS;
 
     companion object {
-        fun fromMultiString(input: String): List<WeaponKeyword> {
+        fun fromMultiString(input: String?): List<WeaponKeyword> {
+            if (input == null ) return emptyList()
             return input.split(";", ignoreCase = true).filter { it.isNotEmpty() }.map { keyword ->
                 fromString(keyword)
             }

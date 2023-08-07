@@ -3,8 +3,33 @@ package testData
 import io.kotest.matchers.shouldBe
 import model.Model
 import kotlin.reflect.KProperty1
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.jvm.isAccessible
 
 object ComparisonFunctions {
+
+    fun <T : Any> T.deepEquals(other: T, ignoreFields: List<String>) {
+        if (this === other) return
+        if (this.javaClass != other.javaClass) throw AssertionError("items are different classes")
+
+        val thisProperties = this::class.declaredMemberProperties
+        val otherProperties = other::class.declaredMemberProperties
+
+        for (property in thisProperties) {
+            if (ignoreFields.contains(property.name)) continue
+
+            property.isAccessible = true
+            val thisValue = property.call(this)
+            val otherValue = otherProperties
+                .firstOrNull { it.name == property.name }
+                ?.apply { isAccessible = true }
+                ?.call(other)
+
+            if (thisValue != otherValue) {
+                throw AssertionError("Elements differ in property: ${property.name}")
+            }
+        }
+    }
 
     fun Map<Model, Int>.compareUnitsIgnoreWeapons(other: Map<Model,Int>){
         this.map { (k,v) -> k.copy(weapons = emptyMap()) to v } shouldBe other.map { (k,v) -> k.copy(weapons = emptyMap()) to v }
